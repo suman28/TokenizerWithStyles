@@ -15,11 +15,6 @@ var isKeywordRemoved = false;
 
 $(function () {
 
-
-
-
-
-
     var items = [];
     var keywords = [];
     var parse;
@@ -38,22 +33,16 @@ $(function () {
             items = data.records;
         }),
 
-
         //get json from second record
         $.get('data/data1.json', function (data) {
             //store records in keywords array
             keywords = data.records;
         })
     ).then(function () {
-
-
         var result = {};
         result = items.concat(keywords);
         var newData = renameNameToValue(result);
         configureItems(newData);
-
-
-
     });
 
 
@@ -85,9 +74,6 @@ $(function () {
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             local: $.map(items, function (item, key) {
 
-
-
-
                 return {
                     // value: item.value || '',
                     //NAME: item.NAME || '',
@@ -98,11 +84,7 @@ $(function () {
             })
         });
 
-
-
-
         config.initialize();
-
 
         $('#typeahead').tokenfield({
             typeahead: [null, {
@@ -139,90 +121,6 @@ $(function () {
                 }
             }]
         });
-
-
-
-
-
-
-
-
-        //var elt = $('#typeahead');
-        /*  elt.materialtags({
-              itemValue: 'value',
-              itemText: function(item) {
- 
- 
- 
- 
-                  if (item) {
-                      if (item.NAME) {
-                          return item.NAME;
-                      } else {
-                          return item.KEYWORD;
-                      }
-                  }
-              },
- 
- 
- 
- 
-              tagClass: function(item) {
-                  if (item.KEYWORD) {
-                      return 'chip chip_green';
-                  } else if (item.TBNAME === 'employee') {
-                      return 'chip chip_blue';
-                  } else if (item.TBNAME === 'empdata') {
-                      return 'chip chip_maroon';
-                  } else {
-                      return 'chip chip_yellow';
-                  }
-              },
-              typeaheadjs: {
-                  name: 'config',
- 
- 
- 
- 
-                  displayKey: function(item) {
-                      if (item) {
-                          if (item.NAME) {
-                              return item.NAME;
-                          } else {
-                              return item.KEYWORD;
-                          }
-                      }
-                  },
-                  source: config.ttAdapter(),
-                  templates: {
-                      empty: [
-                          '<div class="empty-message">',
-                          'Unable to find any match',
-                          '</div>'
-                      ].join('\n'),
-                      suggestion: function(data) {
- 
- 
- 
- 
-                          if (data.TBNAME) {
-                              var _suggestion = "<div>" +
-                                  data.NAME +
-                                  " in " +
-                                  data.TBNAME + "</div>";
-                          } else {
-                              var _suggestion = "<div>" +
-                                  data.KEYWORD + "</div>";
-                          }
- 
- 
- 
- 
-                          return _suggestion;
-                      }
-                  }
-              }
-          });*/
     }
 
     function removed(attrs, tokenAttr) {
@@ -233,8 +131,8 @@ $(function () {
                 var $token = $(this);
                 if ($token.data('attrs').value == tokenAttr) {
                     return $token;
-                };
-            })
+                }
+            });
         });
         var options = {
                 attrs: attrs,
@@ -245,34 +143,16 @@ $(function () {
         $(this).trigger(removeEvent);
 
         // Remove event can be intercepted and cancelled
-        if (removeEvent.isDefaultPrevented()) return
+        if (removeEvent.isDefaultPrevented()) return;
 
         var removedEvent = $.Event('tokenfield:removedtoken', options),
             changeEvent = $.Event('change', {
                 initiator: 'tokenfield'
-            })
+            });
 
         // Remove token from DOM
-        $token.remove()
-
-        // Trigger events
-        //this.$element.val(this.getTokensList()).trigger(removedEvent).trigger(changeEvent)
-
-        // Focus, when necessary:
-        // When there are no more tokens, or if this was the first token
-        // and it was removed with backspace or it was clicked on
-        // if (!this.$wrapper.find('.token').length || e.type === 'click' || firstToken) this.$input.focus()
-
-        // Adjust input width
-        //this.$input.css('width', this.options.minWidth + 'px')
-        // this.update()
-
-        // e.preventDefault()
-        // e.stopPropagation()
+        $token.remove();
     }
-
-
-
 
     function configureBkgColor(e) {
         var target = e.relatedTarget;
@@ -292,24 +172,27 @@ $(function () {
         }
     }
 
+    function buildString(e) {
+
+    }
+
     $('#typeahead')
 
-
         .on('tokenfield:createtoken', function (e) {
-            var data = e.attrs.value.split('|')
-            e.attrs.value = data[1] || data[0]
-            e.attrs.label = data[1] ? data[0] + ' (' + data[1] + ')' : data[0]
+            /* var data = e.attrs.value.split('|')
+             e.attrs.value = data[1] || data[0]
+             e.attrs.label = data[1] ? data[0] + ' (' + data[1] + ')' : data[0]*/
         })
 
 
         .on('tokenfield:createdtoken', function (event) {
-            // Über-simplistic e-mail validation
-            /* var re = /\S+@\S+\.\S+/;
-             var valid = re.test(e.attrs.value);
-             if (!valid) {
-                 $(e.relatedTarget).addClass('invalid');
-             }*/
+            //change the chip color based on its type
             configureBkgColor(event);
+
+            //to build the string once token is entered
+            buildString(event);
+
+
             var tag = event.attrs;
             if (!isKeywordEntered) {
                 if (tag.TBNAME === 'employee') {
@@ -329,12 +212,11 @@ $(function () {
             }
         })
 
-
         .on('tokenfield:edittoken', function (e) {
-            if (e.attrs.label !== e.attrs.value) {
+            /*if (e.attrs.label !== e.attrs.value) {
                 var label = e.attrs.label.split(' (');
                 e.attrs.value = label[0] + '|' + e.attrs.value;
-            }
+            }*/
         })
         .on('tokenfield:removetoken', function (event) {
             var target = event.relatedTarget;
@@ -342,8 +224,7 @@ $(function () {
         })
         .on('tokenfield:removedtoken', function (event) {
             var target = event.relatedTarget;
-            //  alert('Token removed! Token value was: ' + event.attrs.value);
-            document.getElementById("panel6").innerHTML = " ";
+            //document.getElementById("panel6").innerHTML = " ";
             var tag = event.attrs;
             var index, index1;
             var empremove = [];
@@ -373,12 +254,11 @@ $(function () {
                                     var options = {
                                         attrs: _itemArr[_index],
                                         relatedTarget: $(target).closest('.token')
-                                    }
+                                    };
                                     if (!isKeywordRemoved) {
                                         removed(options.attrs, options.attrs.value);
                                         isKeywordRemoved = true;
                                     }
-                                    //$('#typeahead').tokenfield('tokenfield:removetoken', options);
                                 }
                             }
                         } else {
@@ -386,7 +266,6 @@ $(function () {
                                 emparray.splice(index, 1, 0);
                                 temparray.splice(index, 1, 0);
                             }
-                            //  console.log(i);
                         }
                     } else {
                         if (index > -1) {
@@ -403,15 +282,14 @@ $(function () {
                                 if (_index >= indexOfCnt) {
                                     emparray.splice(_index, 1, 0);
                                     temparray.splice(_index, 1, 0);
-                                    var options = {
+                                    var _options = {
                                         attrs: _itemArr[_index],
                                         relatedTarget: $(target).closest('.token')
-                                    }
+                                    };
                                     if (!isKeywordRemoved) {
-                                        removed(options.attrs, options.attrs.value);
+                                        removed(_options.attrs, _options.attrs.value);
                                         isKeywordRemoved = true;
                                     }
-                                    //$('#typeahead').tokenfield('tokenfield:removetoken', options);
                                 }
                             }
                         } else {
@@ -419,28 +297,22 @@ $(function () {
                                 emparray.splice(index, 1, 0);
                                 temparray.splice(index, 1, 0);
                             }
-                            //  console.log(i);
                         }
                     } else {
                         if (index > -1) {
                             emparray.splice(index, 1, 0);
                             temparray.splice(index, 1, 0);
                         }
-                        console.log(i);
                     }
                 } else {
                     if (index > -1) {
                         emparray.splice(index, 1, 0);
                         temparray.splice(index, 1, 0);
                     }
-                    console.log(i);
                 }
             }
             button1_onclick();
-
-        })
-
-
+        });
 });
 
 
@@ -452,8 +324,6 @@ function button1_onclick(event) {
     var ctrl = eventObject.target ? eventObject.target : eventObject.srcElement;
     //TODO: Add your event handler code here
 
-
-    //alert("click");
     console.log(emparray);
     console.log(array);
     var _actionVar = '';
@@ -466,42 +336,21 @@ function button1_onclick(event) {
     var keyword = [];
 
 
-
-
     for (var l = 0; l < array.length; l++) {
-
-
-
-
         key = array[l];
         temparray[key] = 0;
         keyword = emparray[key];
         keywordArr.push(keyword);
-
-
         syskeyword(keywordArr, keyword);
     }
 
 
-
-
     function syskeyword(keywrd_arr, keywrd) {
-
-
-
-
         if (keywrd == "COUNT OF") {
             _print = "SUM";
             _actionVar += " " + "CNT." + emparray[key + 1];
             temparray[key + 1] = 0;
         }
-
-
-
-
-
-
-
 
         if (keywrd == "BY") {
             var bypos = emparray.indexOf('BY');
@@ -522,17 +371,8 @@ function button1_onclick(event) {
                     temparray[bypos + 1] = 0;
                     bypos++;
                 }
-
-
             }
         }
-
-
-
-
-
-
-
 
         if (keywrd == "WHERE") {
             wherekey = emparray[key + 1];
@@ -559,25 +399,11 @@ function button1_onclick(event) {
                 wherekey = wherekey + ' NQ ';
             }
 
-
-
-
             _whereStr = 'WHERE ' + wherekey + "'" + emparray[key + 3] + "'";
         }
 
 
-
-
-
-
-
-
     }
-
-
-
-
-
 
     for (m = 0; m < temparray.length; m++) {
         console.log(temparray[m]);
@@ -587,31 +413,16 @@ function button1_onclick(event) {
     }
 
 
-
-
     var dynamicurl = "&FEXTYPE=TABLE&DATABASE=EMPLOYEE&ACTION=" + _print + "&ACTIONVARIABLE=" + _actionVar + "&BYSTRING=" + _byStr + "&WHERESTRING=" + _whereStr;
     //alert(dynamicurl);
     ajaxcall(dynamicurl);
 
-
-
-
-
-
 }
 //End function button1_onclick
-
-
-
 
 var _url = "/ibi_apps/WFServlet?IBIF_ex=";
 var _ibiapp = "dynamicfex/";
 var _procedure = "procedure_submit";
-
-
-
-
-
 
 function ajaxcall(dynamicurl) {
     alert(dynamicurl);
@@ -625,7 +436,6 @@ function ajaxcall(dynamicurl) {
         }
     });
 }
-
 
 //Begin function combobox1_onchange
 function combobox1_onchange(event) {
